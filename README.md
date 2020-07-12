@@ -8,6 +8,7 @@ Jeff R Reference Notes is my main notebook for code and tips.
 - [ ] Review style guide <https://style.tidyverse.org/>
 - [ ] Go through complete biodversity analysis with the Site C bird data.
 - [ ] Finish the final excercises in R for Data Science.
+- [x] Install 4.0 and fix any problems.
 - [ ] ...
 
 
