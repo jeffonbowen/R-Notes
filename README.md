@@ -7,5 +7,6 @@ Jeff R Reference Notes is my main notebook for code and tips.
 - [ ] Put everything on Github.
 - [ ] Go throug complete biodversity analysis with the Site C bird data.
 - [ ] Finish the final excercises in R for Data Science.
-- [ ] 
+- [ ] ...
+
 
