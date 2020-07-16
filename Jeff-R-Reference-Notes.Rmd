@@ -281,6 +281,10 @@ library(SpadeR)
 SimilarityMult(spxyear.1i, datatype = "incidence_freq", q = 0, nboot = 200)
 ```
 
+# Markdown
+
+kable() for presentation of tables.
+
 ---
 
 
