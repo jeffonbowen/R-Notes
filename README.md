@@ -12,8 +12,8 @@ Jeff R Reference Notes is my main notebook for code and tips.
 - [x] Install 4.0 and fix any problems.
 - [ ] Coding Club tutorials. <https://ourcodingclub.github.io/tutorials.html>
 - [ ] Build Github website. Possible framework is Hugo. Here is an example <https://www.julietteverstaen.com/>
+- [ ]  
 - [ ] 
-- [ ]
-- [ ]
+- [ ] 
 
 
