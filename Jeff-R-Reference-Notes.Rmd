@@ -366,6 +366,10 @@ vegdist(), method - "hellinger"
 decostand()
 
 
+# Markdown
+
+kable() for presentation of tables.
+
 ---
 # Ordination
 Putting things in order.
