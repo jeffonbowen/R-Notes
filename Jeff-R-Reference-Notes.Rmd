@@ -7,7 +7,6 @@ output:
   github_document: default
   
 ---
-
 # General Reference and Learning Materials 
 
 Here are some of the reference and learning materials that I have found useful.    
@@ -21,8 +20,10 @@ Here are some of the reference and learning materials that I have found useful.
 * This is a long list of reference materials: <https://paulvanderlaken.com/2017/08/10/r-resources-cheatsheets-tutorials-books/>
 * This is a good reference for the most-common aspects of R Markdown. <https://www.r-bloggers.com/getting-started-with-r-markdown-guide-and-cheatsheet/>
 * Good blog post on good style. <https://kdestasio.github.io/post/r_best_practices/>
-* Some good stuff here <https://rstats.wtf/>
+* Some good stuff about working in the R environment <https://rstats.wtf/>
 * Jenny Bryan course notes book <https://stat545.com/>
+* <https//:guru99.com> has some good tutorials. 
+
 
 
 ***
@@ -74,19 +75,26 @@ Interactive file selection:
 
 To check for missing values and nulls, use `is.na()` and `is.null()`.
 
+to get of rows with NA, use `na.omit()`.
 
+To get list of unique values, use `distinct()`or `count()` which provides frequency. Its preferable to using the base `table()` function. `janitor::tabyl()` is another option for a 2-way frquecny table.
 
-from Janitor package
-get_dupes(stations, 'Survey Name')
-tabyl(stations, Footprint)
+To find duplicates, can use:
+```
+mtcars %>% 
+  group_by(carb) %>% 
+  filter(n()>1)
+```
+Or `janitor::get_dupes()`
+
+To check coordinates, use `mapview()`.
 
 ---
 # Data Manipulation 
 
 library(tidyverse)
-library(tibble)               For tables
-library(dplyr)                Tidyverse
-library(lubridate)
+library(dplyr)    
+library(lubridate), to work wth time.
 
 Rename columns
 colnames(x) <- c("a", "b")    Base R
@@ -103,31 +111,54 @@ Create variables
 Filter out NA values
 x <- x %>% filter(!is.na(BHC20_2))
 
-Recode values
+Recode values using base R
 dat[dat$SERAL_1 == "AS" & !is.na(dat$SERAL_1), ]$SERAL_1 <- "as"
+
+The tidy way is to uese `if_else()` or if many substittions, `case_when()`. In the example below, note the use of `TRUE ~ variable` for all other values to stay the same.
+```
+country_totals <- country_totals %>% 
+  mutate(country_name = 
+           case_when(
+             country == "UK" ~ "United Kingdom",
+             TRUE ~ country_name
+           )
+  )
+```
 
 To  convert to factor
 StationIDxEnvTest$CountOfStationID <- as.factor(StationIDxEnvTest$CountOfStationID)
 
+## Abundance to Presence-Absence
+Can use `if_else(across(...), ...)` or something like that.
+
 # Count and tally
 
 Group_by and Summarize
-sumdat <- data %>% group_by(GRID_ID, PRVUD, PRVUDOF, Accessible, Ownership, Candidate2, Region, BHC20_1) %>% 
+sumdat <- 
+  data %>% 
+  group_by(GRID_ID, PRVUD, PRVUDOF, Accessible, Ownership, Candidate2, Region, BHC20_1) %>% 
   summarise(Total = sum(Shape_Area/10000)) %>% 
   top_n(1, Total) %>% 
   filter(Candidate2 == "Yes")
 
+
 ---
 # Display and Formatting
 
-Format %
-densplot$Perc <- round(densplot$Perc, digits = 2)
-densplot$Perc <- paste(densplot$Perc, "%")
+For turning strings in to numbers, use 'stringr'.
+See examples in Home Finances project.
+
+---
+# Exploratory Data Analysis
+
+The TidyTuesday Penguin data analysis has some examples.
+https://github.com/jeffonbowen/TidyTuesday
 
 ---
 # Visualization 
 library(ggplot2)              For graphics
 library(cowplot)              addon to ggplot
+library(ggrepel)              Add on for moving labels around
 
 g2 <- ggplot(emmE.plot, aes(x=xEasting, y=mean, group=Habitat))+
   geom_line(aes(colour=Habitat))+    
@@ -144,7 +175,7 @@ g2
 # Modelling
 
 ## Reference
-There is some good mateiral here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>
+There is some good material here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>
 
 Reminder about descriptive & explanatory models versus predictive models. Descriptive and explanatory model fit sually evaluted using AIC or similar. Predictive models tested with prediction accuracy (e.g., AUC).  
 
@@ -188,7 +219,7 @@ rootogram(fit.p)
 
 STEP 2. Fit model
 
-Use `dredge(m.full)` to fit all possible combinations of variables.
+Use `dredge(model.full)` to fit all possible combinations of variables.
 
 
 STEP 3. Compare models
@@ -247,7 +278,54 @@ emmE <- as.data.frame(emmeans(pois.m2, specs="xEasting",
 
 ### Extract the coefficients data frame
 x <-summary.glm(Count.model1)$coefficients 
+---
+# Generalized Additive Models
+See Gavin Simpson seminar on GAMs. 
+https://github.com/gavinsimpson/intro-gam-webinar-2020
 
+* A GAM is a sum of smooth functions (basis functions or small curves).
+* Start with using REML as default. Most robust to violation of assumptions.
+* Categorical variables - can't smooth, but can be included in the model. Can be used as a random effect as well. 
+* Random effects can be fit in gam() and bam() if simple, without having to use gamm() of gamm4(). bs = 're'. See slids for more explanation of options.
+
+Next steps from Gavin Simpson:
+
+* Read Simon Wood's book!
+
+* Lots more material on our ESA GAM Workshop site
+  [https://noamross.github.io/mgcv-esa-workshop/]()
+
+* Noam Ross' free GAM Course
+  <https://noamross.github.io/gams-in-r-course/>
+
+A couple of papers:
+
+1. Simpson, G.L., 2018. Modelling Palaeoecological Time Series Using Generalised Additive Models. Frontiers in Ecology and Evolution 6, 149. https://doi.org/10.3389/fevo.2018.00149
+
+2. Pedersen, E.J., Miller, D.L., Simpson, G.L., Ross, N., 2019. Hierarchical generalized additive models in ecology: an introduction with mgcv. PeerJ 7, e6876. https://doi.org/10.7717/peerj.6876
+]
+
+
+
+---
+# Classification
+library(rpart) for Recursive Classification and Regression. To produce a classification tree. 
+
+For plotting, package rpart.plot.
+
+Example before fro TidyTuesday Penguins. https://github.com/jeffonbowen/TidyTuesday
+
+```{r}
+fitr <- rpart(data = penguins, formula = species ~ bill_length_mm + bill_depth_mm, 
+              flipper_length_mm + body_mass_g)
+fitr
+summary(fitr)
+# Print table of optimal prunings
+printcp(fitr)
+# Plot
+plot(fitr)
+text(fitr)
+```
 
 
 ---
@@ -280,9 +358,60 @@ ggiNEXT(out, type=1, facet.var="order")
 library(SpadeR)
 SimilarityMult(spxyear.1i, datatype = "incidence_freq", q = 0, nboot = 200)
 ```
-
 ---
 
+# Dissimilarity
+Two key functions:
+vegdist(), method - "hellinger"
+decostand()
+
+
+---
+# Ordination
+Putting things in order.
+* Arrange samples samples along gradients
+* Map data to lower dimensions
+
+## Unconstrained
+First we look for major variation, then relate to environmental variation. 
+
+PCA: Linear model. Most useful for env data, sometimes species data.
+CA: Unimodal method. Species data and presence-absence, esp. where non-linear responses are observed. Very similar to PCA, ecept weighted form. 
+PCO and NMDS: Any kind of data. Doesn't care about gradinet, just dissimilarity. 
+
+## NMDS from using Palmer Penguins data. 
+
+```{r}
+pengv <- penguins %>% 
+  select(3:6)
+
+nmds <- metaMDS(pengv, distance = "bray")
+
+# extract NMDS scores (x and y coordinates)
+data.scores = as.data.frame(scores(nmds))
+
+# add columns to data frame 
+data.scores$species <- penguins$species
+data.scores$sex <- penguins$sex
+
+n_plot <- ggplot(data.scores, aes(x = NMDS1, y = NMDS2)) + 
+  geom_point(size = 2, aes(shape = sex, colour = species))+ 
+  theme(axis.text.y = element_text(colour = "black", size = 10, face = "bold"), 
+        axis.text.x = element_text(colour = "black", face = "bold", size = 10), 
+        legend.text = element_text(size = 10, face ="bold", colour ="black"), 
+        legend.position = "right", axis.title.y = element_text(face = "bold", size = 11), 
+        axis.title.x = element_text(face = "bold", size = 10, colour = "black"), 
+        legend.title = element_text(size = 11, colour = "black", face = "bold"), 
+        panel.background = element_blank(), panel.border = element_rect(colour = "black", fill = NA, size = 1.2),
+        legend.key=element_blank()) + 
+  labs(x = "NMDS1", colour = "Species", y = "NMDS2", shape = "Sex") 
+n_plot
+
+ggsave(plot = n_plot, "nmds_plot.png")
+```
+
+---
+# Mapping
 
 ## Main packages for mapping in R
 library(sp)         #Key package. Though being replaced by sf.
