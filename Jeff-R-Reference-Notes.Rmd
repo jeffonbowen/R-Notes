@@ -15,7 +15,7 @@ Here are some of the reference and learning materials that I have found useful.
 * Data Camp seems very good for guided training.  
 * Cookbook for R is handy, though wish it used tidy functions more.  
 * Also the companion ggplot2 cookbook, <http://www.cookbook-r.com/Graphs/>
-* This UBC course site has god referencenfor fitting models in ecology.  <https://www.zoology.ubc.ca/~schluter/R/Model.html>  
+* This UBC course site has good references for fitting models in ecology.  <https://www.zoology.ubc.ca/~schluter/R/Model.html>  
 * Ecology in R (see Udemy website).   
 * This is a long list of reference materials: <https://paulvanderlaken.com/2017/08/10/r-resources-cheatsheets-tutorials-books/>
 * This is a good reference for the most-common aspects of R Markdown. <https://www.r-bloggers.com/getting-started-with-r-markdown-guide-and-cheatsheet/>
@@ -23,6 +23,7 @@ Here are some of the reference and learning materials that I have found useful.
 * Some good stuff about working in the R environment <https://rstats.wtf/>
 * Jenny Bryan course notes book <https://stat545.com/>
 * <https//:guru99.com> has some good tutorials. 
+* This is a good reference list. <https://github.com/iamericfletcher/r-learning-resources/blob/main/README.md>
 
 
 
@@ -446,7 +447,18 @@ library(htmlwidgets)
 library(shiny)
 library(webshot)
 
+## Static Maps
+{gglot} keeps thingsin the tidyverse.
 
+{rnaturalearth} is good source for data and works nice with sf and ggplot.
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+world %>% 
+  ggplot() +
+  geom_sf() +
+  ggtitle("World")
+```
 
 Mapview, good for quick view
 `mapview(x)`
