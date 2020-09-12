@@ -42,15 +42,11 @@ getwd()
 setwd("c:/      ")  
 list.files()      Useful for copying a filename '  
 ```
-
 Package readr for importing csv files and setting column types.
 ```
 indat <- read_csv('CEM_Oct10_13.csv', 
                   col_types = cols(.default = "c",
-                                   'Shape_Area' = col_double(),
-                                   'SDEC_1' = col_integer(), 
-                                   'SDEC_2' = col_integer(), 
-                                   'SDEC_3' = col_integer()))  
+                                   'Shape_Area' = col_double())
 ```
 Package readxl to read MS Excel files.
 `stations <- read_excel("dat/Songto2019data.xlsx", "Stations")`
@@ -66,19 +62,19 @@ Interactive file selection:
 # View and clean data
 
 `Dim()` gives dimensions, but that is in the environment window anyway.  
-`Print()`  
 `head()` is handy for initial look at data.   
 `tail()`  
 `str()`  
 `summary()`  
-`merge()` from base R. I would use dplyr. 
 `rm()` remove from memory
 
 To check for missing values and nulls, use `is.na()` and `is.null()`.
+To get rid of rows with NA, use `na.omit()`.
 
-to get of rows with NA, use `na.omit()`.
+To get list of unique values, use `n_distinct()`or `count()` which provides frequency. Its preferable to using the base `table()` function.  
 
-To get list of unique values, use `distinct()`or `count()` which provides frequency. Its preferable to using the base `table()` function. `janitor::tabyl()` is another option for a 2-way frquecny table.
+Package {janitor} helpful for cleaning data. 
+`janitor::tabyl()` is another option for a 2-way frequency table.
 
 To find duplicates, can use:
 ```
@@ -173,18 +169,18 @@ g2 <- ggplot(emmE.plot, aes(x=xEasting, y=mean, group=Habitat))+
 g2
 
 ---
+
 # Modelling
 
 ## Reference
 There is some good material here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>
 
-Reminder about descriptive & explanatory models versus predictive models. Descriptive and explanatory model fit sually evaluted using AIC or similar. Predictive models tested with prediction accuracy (e.g., AUC).  
-
+Reminder about descriptive & explanatory models versus predictive models. Descriptive and explanatory model fit usually evaluted using AIC or similar. Predictive models tested with prediction accuracy (e.g., AUC).  
 
 
 ## Packages for assessing data distribution
 First use simple frequency histograms using `hist()` of ggplot.
-library(vcd)                  Fits a discrete (count data) distribution for goodness-of-fit tests.
+`library(vcd)` Fits a discrete (count data) distribution for goodness-of-fit tests.  
 
 ## Packages for regression-type analyses
 Common packages for regression-type analyses
@@ -276,9 +272,30 @@ emmE <- as.data.frame(emmeans(pois.m2, specs="xEasting",
                               at=list(xEasting=seq(-2.03, 1.13, length.out=50))))
 
 
-
 ### Extract the coefficients data frame
-x <-summary.glm(Count.model1)$coefficients 
+`x <-summary.glm(Count.model1)$coefficients`   
+
+### Many Models
+
+Use the tidy way to first nest the data and then save model outputs in list dataframe. {broomExtra} package also has some important tools.
+See:  
+[R for Data Science](https://r4ds.had.co.nz/many-models.html)  
+[Broom and Tidy](https://cran.r-project.org/web/packages/broom/vignettes/broom_and_dplyr.html)  
+
+Example below from BBFM cavity nest analysis. 
+
+```
+decay_nest <- decay_nest %>% 
+  mutate(model = map(decay_nest$data, decay_model),
+         tidied = map(model, tidy),
+         glanced = map(model, glance),
+         augmented = map(model, augment),
+         means = map(model, 
+                     ~as.data.frame(emmeans(.x, "Structural_Stage",
+                                            type = "response")))
+         ) %>% 
+  unnest(means)
+```  
 ---
 # Generalized Additive Models
 See Gavin Simpson seminar on GAMs. 
