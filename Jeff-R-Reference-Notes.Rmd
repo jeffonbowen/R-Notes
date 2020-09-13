@@ -9,8 +9,7 @@ output:
 ---
 # General Reference and Learning Materials 
 
-Here are some of the reference and learning materials that I have found useful.    
-
+Here are some of the reference and learning materials that I have found useful.      
 * R for Data Science. <https://r4ds.had.co.nz/transform.html>. I think this is a good entry to R after having learned just the basics of base R.  
 * Data Camp seems very good for guided training.  
 * Cookbook for R is handy, though wish it used tidy functions more.  
@@ -49,7 +48,7 @@ indat <- read_csv('CEM_Oct10_13.csv',
                                    'Shape_Area' = col_double())
 ```
 Package readxl to read MS Excel files.
-`stations <- read_excel("dat/Songto2019data.xlsx", "Stations")`
+`stations <- read_excel("dat/Songto2019data.xlsx", "Stations", sheet = xxx, skip = lines)`
 
 ## Setting Default for all columns  
 `col_types = cols(.default = "c")`
@@ -68,12 +67,15 @@ Interactive file selection:
 `summary()`  
 `rm()` remove from memory
 
+`glimpse()` is a nice way to have a quick peak at data. Can use at end of pipe. 
+
 To check for missing values and nulls, use `is.na()` and `is.null()`.
 To get rid of rows with NA, use `na.omit()`.
 
 To get list of unique values, use `n_distinct()`or `count()` which provides frequency. Its preferable to using the base `table()` function.  
 
 Package {janitor} helpful for cleaning data. 
+`janitor::clean_names()`
 `janitor::tabyl()` is another option for a 2-way frequency table.
 
 To find duplicates, can use:
@@ -148,8 +150,15 @@ See examples in Home Finances project.
 ---
 # Exploratory Data Analysis
 
-The TidyTuesday Penguin data analysis has some examples.
+There are a couple of packages that can help automate initial exploration.  
+{skimr}
+{DataExplorer}  
+
+The TidyTuesday Penguin data analysis has some of my own examples.
 https://github.com/jeffonbowen/TidyTuesday
+
+
+
 
 ---
 # Visualization 
