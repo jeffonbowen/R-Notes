@@ -7,6 +7,8 @@ output:
   github_document: default
 ---
 
+Notes on regression-type models.  
+
 # Reference
 There is some good material here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>
 

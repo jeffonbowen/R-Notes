@@ -1,0 +1,95 @@
+---
+title: "Diversity and Community Analyses"
+author: "Jeff Matheson"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+  github_document: default
+  
+---
+
+# Biodiversity Analyses
+
+library(vegan)
+library(dismo)                Species distribution models
+library(BiodiversityR)
+library(indicspecies)         Indicator species analysis
+
+
+RankAbun.1 <- rankabuncomp(stxsp, y=st.year, factor='Survey.Name', scale='abundance', 
+                           legend=F, ylim = c(0,600), rainbow=T)
+RankAbun.1 <- rankabuncomp(stxsp, y=st.year, factor='Survey.Name', scale='proportion',
+                           legend=T, rainbow=T)
+RankAbun.1 <- rankabuncomp(stXspAbunSMSA, y=stXyearSMSA, factor='Survey.Name', scale='proportion',
+                           legend=T, rainbow=T)
+```
+library(iNEXT)
+out <- iNEXT(spider, q=c(0,1,2), datatype="abundance", size=m)
+ggiNEXT(x, type=1, se=TRUE, facet.var="order", color.var="site", grey=FALSE)
+
+DataInfo(spXyearSMSA)
+out <- iNEXT(spXyearSMSAn, q=0, datatype="incidence_freq",endpoint=336)
+out <- iNEXT(spXyearSMSAn, q=c(0,1,2), datatype="incidence_freq",endpoint=336)
+ggiNEXT(out,type=1,se=TRUE)
+ggiNEXT(out,type=2,se=TRUE)
+ggiNEXT(out, type=1, facet.var="order")
+
+library(SpadeR)
+SimilarityMult(spxyear.1i, datatype = "incidence_freq", q = 0, nboot = 200)
+```
+---
+
+# Dissimilarity
+Two key functions:
+vegdist(), method - "hellinger"
+decostand()
+
+
+# Markdown
+
+kable() for presentation of tables.
+
+---
+# Ordination
+Putting things in order.
+* Arrange samples samples along gradients
+* Map data to lower dimensions
+
+## Unconstrained
+First we look for major variation, then relate to environmental variation. 
+
+PCA: Linear model. Most useful for env data, sometimes species data.
+CA: Unimodal method. Species data and presence-absence, esp. where non-linear responses are observed. Very similar to PCA, ecept weighted form. 
+PCO and NMDS: Any kind of data. Doesn't care about gradinet, just dissimilarity. 
+
+## NMDS from using Palmer Penguins data. 
+
+```{r}
+pengv <- penguins %>% 
+  select(3:6)
+
+nmds <- metaMDS(pengv, distance = "bray")
+
+# extract NMDS scores (x and y coordinates)
+data.scores = as.data.frame(scores(nmds))
+
+# add columns to data frame 
+data.scores$species <- penguins$species
+data.scores$sex <- penguins$sex
+
+n_plot <- ggplot(data.scores, aes(x = NMDS1, y = NMDS2)) + 
+  geom_point(size = 2, aes(shape = sex, colour = species))+ 
+  theme(axis.text.y = element_text(colour = "black", size = 10, face = "bold"), 
+        axis.text.x = element_text(colour = "black", face = "bold", size = 10), 
+        legend.text = element_text(size = 10, face ="bold", colour ="black"), 
+        legend.position = "right", axis.title.y = element_text(face = "bold", size = 11), 
+        axis.title.x = element_text(face = "bold", size = 10, colour = "black"), 
+        legend.title = element_text(size = 11, colour = "black", face = "bold"), 
+        panel.background = element_blank(), panel.border = element_rect(colour = "black", fill = NA, size = 1.2),
+        legend.key=element_blank()) + 
+  labs(x = "NMDS1", colour = "Species", y = "NMDS2", shape = "Sex") 
+n_plot
+
+ggsave(plot = n_plot, "nmds_plot.png")
+```

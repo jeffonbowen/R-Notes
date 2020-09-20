@@ -1,0 +1,87 @@
+---
+title: "Spatial"
+author: "Jeff Matheson"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+  github_document: default
+---
+
+# Mapping
+
+## Main packages for mapping in R
+library(sp)         #Key package. Though being replaced by sf.
+library(sf)         #Replaces sp. sp still needed for some things.
+library(rgdal)      #Bindings for GDAL(?) seems to provide helper functions
+library(raster)     #This is key for raster manipulation.
+library(rasterVis)
+library(maptools)   #Haven't used this yet
+
+library(rgeos)      ? Has some data. Geometry Engine
+library(tmap)
+library(tmaptools)
+library(ggmap)      #Spatial Visualization with ggplot2
+
+library(rspatial)
+
+library(maps)
+
+library(bcmaps)
+
+## For dynamic maps
+
+library(leaflet)    Key package for dynamic maps. 
+library(mapview)    Wrapper for leaflet. Great for quick viewing.
+
+## Web integration 
+library(htmlwidgets)
+library(shiny)
+library(webshot)
+
+## Static Maps
+{gglot} keeps thingsin the tidyverse.
+
+{rnaturalearth} is good source for data and works nice with sf and ggplot.
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+world %>% 
+  ggplot() +
+  geom_sf() +
+  ggtitle("World")
+```
+
+Mapview, good for quick view
+`mapview(x)`
+
+Leaflet
+```
+m <- leaflet() %>% 
+  addTiles() 
+```
+
+Lat/long NAD83 is EPSG 4269
+Lat/long WGS84 is EPSG 4326
+UTM NAD83 zone 10N is EPSG 26911 
+
+How to reproject
+```
+newcrs = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+footprint <- spTransform(footprint, newcrs)
+```
+
+Read/Write shapefile
+library(rgdal)
+writeOGR(footprint, dsn = ".", "fp_wgs84", driver="ESRI Shapefile")
+
+Read UTM cooridnates and write same datafile with lat/long 
+dat <- read_csv("WOODto2019.csv") 
+dat <- SpatialPointsDataFrame(coords = cbind(woodat$UTM_Northing, woodat$UTM_Easting), 
+                              data = woodat, proj4string=CRS("+proj=utm +zone=10 +north +datum=NAD83"))  
+dat <- spTransform(wooutm, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+datout <- (cbind(dat@data, dat@coords)) %>% 
+                  rename(Longitude = coords.x1, Latitude = coords.x2)
+
+Rasters
+GDALinfo("") raster file attributes before reading. 

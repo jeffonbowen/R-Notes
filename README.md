@@ -13,8 +13,8 @@ Jeff R Reference Notes is my main notebook for code and tips.
 - [ ] Coding Club tutorials. <https://ourcodingclub.github.io/tutorials.html>. Lots to do here.
 - [ ] Build Github website. https://bookdown.org/yihui/blogdown/ Here is an example <https://www.julietteverstaen.com/>.
 - [ ] Write blog post
-- [ ] Check out more of Eric Fletcher's stuff
-- [ ] x
+- [ ] Check out more of Eric Fletcher's reference lists
+- [ ] Practice mapiping. Use {bcmaps} 
 - [ ] x
 
 
