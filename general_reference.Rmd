@@ -1,5 +1,5 @@
 ---
-title: "Jeff's R Reference Notes"
+title: "R Reference Notes"
 output: 
   html_notebook:
     toc: true
