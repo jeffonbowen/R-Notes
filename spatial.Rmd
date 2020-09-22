@@ -84,4 +84,25 @@ datout <- (cbind(dat@data, dat@coords)) %>%
                   rename(Longitude = coords.x1, Latitude = coords.x2)
 
 Rasters
-GDALinfo("") raster file attributes before reading. 
+GDALinfo("") raster file attributes before reading.  
+
+
+# Read File Geodatabase with sf
+And then save as KML.  
+```{r}
+
+library(sf)
+library(mapview)
+
+cliff_swallows <- read_sf("C:/Users/jeff.matheson/Downloads/deerfoot_cliff/d4781c57ea5c4ad79a6a7717e3c8f9f5.gdb")
+c("C:/Users/jeff.matheson/Downloads/deerfoot_cliff/d4781c57ea5c4ad79a6a7717e3c8f9f5.gdb")
+
+mapview(cliff_swallows)
+
+st_write(cliff_swallows, 
+         driver = "KML", 
+         "C:/Users/jeff.matheson/Downloads/deerfoot_cliff/CLSW.kml")
+
+
+```
+
