@@ -14,7 +14,7 @@ Jeff R Reference Notes is my main notebook for code and tips.
 - [ ] Build Github website. https://bookdown.org/yihui/blogdown/ Here is an example <https://www.julietteverstaen.com/>.
 - [ ] Write blog post
 - [ ] Check out more of Eric Fletcher's reference lists
-- [ ] Practice mapiping. Use {bcmaps} 
+- [ ] Practice mapping. Use {bcmaps} 
 - [ ] x
 
 
