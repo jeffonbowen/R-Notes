@@ -9,8 +9,10 @@ output:
 
 Notes on regression-type models.  
 
+**Note:** The dune data in the vegan package is good example dataset for species ocurrence. Use the dune data to work up the example code.  
+
 # Reference
-There is some good material here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>
+There is some good material here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>  
 
 Reminder about descriptive & explanatory models versus predictive models. Descriptive and explanatory model fit usually evaluted using AIC or similar. Predictive models tested with prediction accuracy (e.g., AUC).  
 
@@ -23,7 +25,7 @@ First use simple frequency histograms using `hist()` of ggplot.
 Common packages for regression-type analyses
 library(lme4)                 GLMMs
 library(MASS)                 Negative Binomial GLM
-library(glmmTMB)              for nb and zi, but can do everyhting esle too
+library(glmmTMB)              for nb and zi, but can do everyhting else too
 library(pscl)                 zero-inflated models
 library(mgcv)                 GAM
 
@@ -40,29 +42,34 @@ library(emmeans)              Estimate marginal means
 library(broom)                Tidy results tables for exporting and printing 
 library(broom.mixed)          Same as above, but for mixed models
 
-library(corrplot)             Come back to this and find home
+library(corrplot)             Come back to this and find home  
 
 
 # Typical steps for regression
 
 **STEP 1. Visualize distribution**
+```{r}
+library(vegan)
+data(dune)
+data(dune.env)
+```
 Make a histogram using hist() or ggplot(); visually inspect
 For count data, use package 'vcd' to fit possible disubutions
 fit.p <- goodfit(dat$Richness, type = "poisson")  also binomial and nbinomial
 summary(fit.p)
 rootogram(fit.p)
 
-STEP 2. Fit model
+**STEP 2. Fit model**
 
 Use `dredge(model.full)` to fit all possible combinations of variables.
 
 
-STEP 3. Compare models
+**STEP 3. Compare models**  
 Comare models using package 'MuMin'. 
 model.sel(m1, m2, m3, m4)
 ** Figure out weights and model averaging
 
-STEP 4. Assess model fit. 
+**STEP 4. Assess model fit.** 
 If glm, view standard diagnostic plots
 `plot(model1)`  or
 Examine Residuals for Gaussian
@@ -70,9 +77,10 @@ Examine Residuals for Gaussian
 `qqline(residuals(bestmod))`
 `plot(bestmod,MonYear~resid(.))`
 
-Visreg?
+Visreg?  
 
-For mixed models, use package 'DHARMa' to simulate residuals.
+For non-Gaussian and mixed models, use package 'DHARMa' to simulate residuals.
+
 res <- simulateResiduals(fittedModel = bestmod)
 plot(res)
 testDispersion(res)
