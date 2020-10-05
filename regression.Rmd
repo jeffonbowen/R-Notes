@@ -7,77 +7,54 @@ output:
   github_document: default
 ---
 
-Notes on regression-type models.  
+Notes on regression-type models.
 
 # Reference
+
 There is some good material here on models and model viz. <https://uvastatlab.github.io/phdplus/index.html>
 
-Reminder about descriptive & explanatory models versus predictive models. Descriptive and explanatory model fit usually evaluted using AIC or similar. Predictive models tested with prediction accuracy (e.g., AUC).  
+Reminder about descriptive & explanatory models versus predictive models. Descriptive and explanatory model fit usually evaluted using AIC or similar. Predictive models tested with prediction accuracy (e.g., AUC).
 
 # Packages
+
 ## Packages for assessing data distribution
-First use simple frequency histograms using `hist()` of ggplot.
-`library(vcd)` Fits a discrete (count data) distribution for goodness-of-fit tests.  
+
+First use simple frequency histograms using `hist()` of ggplot. `library(vcd)` Fits a discrete (count data) distribution for goodness-of-fit tests.
 
 ## Packages for regression-type analyses
-Common packages for regression-type analyses
-library(lme4)                 GLMMs
-library(MASS)                 Negative Binomial GLM
-library(glmmTMB)              for nb and zi, but can do everyhting esle too
-library(pscl)                 zero-inflated models
-library(mgcv)                 GAM
+
+Common packages for regression-type analyses library(lme4) GLMMs library(MASS) Negative Binomial GLM library(glmmTMB) for nb and zi, but can do everyhting esle too library(pscl) zero-inflated models library(mgcv) GAM
 
 ## Packages for evaluating model fit
-library(DHARMa)               Analysis of residuals for mixed models
+
+library(DHARMa) Analysis of residuals for mixed models
 
 ## Common packages for interpretting results
-library(visreg)               regression visualization
-library(MuMIn)                model selection
-library(effects)              for extracting effects terms. Use effects or Alleffects
-library(emmeans)              Estimate marginal means
+
+library(visreg) regression visualization library(MuMIn) model selection library(effects) for extracting effects terms. Use effects or Alleffects library(emmeans) Estimate marginal means
 
 ## Helpers
-library(broom)                Tidy results tables for exporting and printing 
-library(broom.mixed)          Same as above, but for mixed models
 
-library(corrplot)             Come back to this and find home
+library(broom) Tidy results tables for exporting and printing library(broom.mixed) Same as above, but for mixed models
 
+library(corrplot) Come back to this and find home
 
 # Typical steps for regression
 
-**STEP 1. Visualize distribution**
-Make a histogram using hist() or ggplot(); visually inspect
-For count data, use package 'vcd' to fit possible disubutions
-fit.p <- goodfit(dat$Richness, type = "poisson")  also binomial and nbinomial
-summary(fit.p)
-rootogram(fit.p)
+**STEP 1. Visualize distribution** Make a histogram using hist() or ggplot(); visually inspect For count data, use package 'vcd' to fit possible disubutions fit.p \<- goodfit(dat$Richness, type = "poisson") also binomial and nbinomial summary(fit.p) rootogram(fit.p)
 
 STEP 2. Fit model
 
 Use `dredge(model.full)` to fit all possible combinations of variables.
 
+STEP 3. Compare models Comare models using package 'MuMin'. model.sel(m1, m2, m3, m4) \*\* Figure out weights and model averaging
 
-STEP 3. Compare models
-Comare models using package 'MuMin'. 
-model.sel(m1, m2, m3, m4)
-** Figure out weights and model averaging
-
-STEP 4. Assess model fit. 
-If glm, view standard diagnostic plots
-`plot(model1)`  or
-Examine Residuals for Gaussian
-`qqnorm(residuals(bestmod))`
-`qqline(residuals(bestmod))`
-`plot(bestmod,MonYear~resid(.))`
+STEP 4. Assess model fit. If glm, view standard diagnostic plots `plot(model1)` or Examine Residuals for Gaussian `qqnorm(residuals(bestmod))` `qqline(residuals(bestmod))` `plot(bestmod,MonYear~resid(.))`
 
 Visreg?
 
-For mixed models, use package 'DHARMa' to simulate residuals.
-res <- simulateResiduals(fittedModel = bestmod)
-plot(res)
-testDispersion(res)
-There are other test in 'DHAMRa' to explore.
-Test for overdispersion. Unlear of these work for mixed models. 
+For mixed models, use package 'DHARMa' to simulate residuals. res \<- simulateResiduals(fittedModel = bestmod) plot(res) testDispersion(res) There are other test in 'DHAMRa' to explore. Test for overdispersion. Unlear of these work for mixed models.
+
 ```{r eval=FALSE}
 deviance(bestmod)/df.residual(bestmod)
 # or
@@ -91,73 +68,59 @@ overdisp_fun <- function(model) {
 }
 overdisp_fun(bestmod)
 ```
-**STEP 5. Estimate Means and Plot** 
-Plot all effects
-ae <- allEffects(bestmod)
-plot(ae, residuals="TRUE")
-ae
-Or plot individual effects
-e <- predictorEffect("BHC7", bestmod)
-plot(e)
+
+**STEP 5. Estimate Means and Plot** Plot all effects ae \<- allEffects(bestmod) plot(ae, residuals="TRUE") ae Or plot individual effects e \<- predictorEffect("BHC7", bestmod) plot(e)
 
 Package EMMEANS for marginal means
 
-To make predictions, may need to create a grid.
-expand.grip, tidyr:: expand_grid, modelr::data_grid
+To make predictions, may need to create a grid. expand.grip, tidyr:: expand\_grid, modelr::data\_grid
 
-What a out predictions for continuous variables?
-emmE <- as.data.frame(emmeans(pois.m2, specs="xEasting", 
-                              at=list(xEasting=seq(-2.03, 1.13, length.out=50))))
-
+What a out predictions for continuous variables? emmE \<- as.data.frame(emmeans(pois.m2, specs="xEasting", at=list(xEasting=seq(-2.03, 1.13, length.out=50))))
 
 ### Extract the coefficients data frame
-`x <-summary.glm(Count.model1)$coefficients`   
+
+`x <-summary.glm(Count.model1)$coefficients`
 
 ### Many Models
 
-Use the tidy way to first nest the data and then save model outputs in list dataframe. {broomExtra} package also has some important tools.
-See:  
+Use the tidy way to first nest the data and then save model outputs in list dataframe. {broomExtra} package also has some important tools. See:  
 [R for Data Science](https://r4ds.had.co.nz/many-models.html)  
-[Broom and Tidy](https://cran.r-project.org/web/packages/broom/vignettes/broom_and_dplyr.html)  
+[Broom and Tidy](https://cran.r-project.org/web/packages/broom/vignettes/broom_and_dplyr.html)
 
-Example below from BBFM cavity nest analysis. 
+Example below from BBFM cavity nest analysis.
 
-```
-decay_nest <- decay_nest %>% 
-  mutate(model = map(decay_nest$data, decay_model),
-         tidied = map(model, tidy),
-         glanced = map(model, glance),
-         augmented = map(model, augment),
-         means = map(model, 
-                     ~as.data.frame(emmeans(.x, "Structural_Stage",
-                                            type = "response")))
-         ) %>% 
-  unnest(means)
-```  
----
+    decay_nest <- decay_nest %>% 
+      mutate(model = map(decay_nest$data, decay_model),
+             tidied = map(model, tidy),
+             glanced = map(model, glance),
+             augmented = map(model, augment),
+             means = map(model, 
+                         ~as.data.frame(emmeans(.x, "Structural_Stage",
+                                                type = "response")))
+             ) %>% 
+      unnest(means)
+
+------------------------------------------------------------------------
+
 # Generalized Additive Models
-See Gavin Simpson seminar on GAMs. 
-https://github.com/gavinsimpson/intro-gam-webinar-2020
 
-* A GAM is a sum of smooth functions (basis functions or small curves).
-* Start with using REML as default. Most robust to violation of assumptions.
-* Categorical variables - can't smooth, but can be included in the model. Can be used as a random effect as well. 
-* Random effects can be fit in gam() and bam() if simple, without having to use gamm() of gamm4(). bs = 're'. See slids for more explanation of options.
+See Gavin Simpson seminar on GAMs. <https://github.com/gavinsimpson/intro-gam-webinar-2020>
+
+-   A GAM is a sum of smooth functions (basis functions or small curves).
+-   Start with using REML as default. Most robust to violation of assumptions.
+-   Categorical variables - can't smooth, but can be included in the model. Can be used as a random effect as well.
+-   Random effects can be fit in gam() and bam() if simple, without having to use gamm() of gamm4(). bs = 're'. See slids for more explanation of options.
 
 Next steps from Gavin Simpson:
 
-* Read Simon Wood's book!
+-   Read Simon Wood's book!
 
-* Lots more material on our ESA GAM Workshop site
-  [https://noamross.github.io/mgcv-esa-workshop/]()
+-   Lots more material on our ESA GAM Workshop site [https://noamross.github.io/mgcv-esa-workshop/]()
 
-* Noam Ross' free GAM Course
-  <https://noamross.github.io/gams-in-r-course/>
+-   Noam Ross' free GAM Course <https://noamross.github.io/gams-in-r-course/>
 
 A couple of papers:
 
-1. Simpson, G.L., 2018. Modelling Palaeoecological Time Series Using Generalised Additive Models. Frontiers in Ecology and Evolution 6, 149. https://doi.org/10.3389/fevo.2018.00149
+1.  Simpson, G.L., 2018. Modelling Palaeoecological Time Series Using Generalised Additive Models. Frontiers in Ecology and Evolution 6, 149. <https://doi.org/10.3389/fevo.2018.00149>
 
-2. Pedersen, E.J., Miller, D.L., Simpson, G.L., Ross, N., 2019. Hierarchical generalized additive models in ecology: an introduction with mgcv. PeerJ 7, e6876. https://doi.org/10.7717/peerj.6876
-]
-
+2.  Pedersen, E.J., Miller, D.L., Simpson, G.L., Ross, N., 2019. Hierarchical generalized additive models in ecology: an introduction with mgcv. PeerJ 7, e6876. <https://doi.org/10.7717/peerj.6876> ]
