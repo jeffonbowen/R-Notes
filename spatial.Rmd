@@ -150,4 +150,30 @@ server <- function(input, output){}
 shinyApp(ui=ui, server = server)
 
 
+<<<<<<< HEAD
 ```
+=======
+Rasters
+GDALinfo("") raster file attributes before reading.  
+
+
+# Read File Geodatabase with sf
+And then save as KML.  
+```{r}
+
+library(sf)
+library(mapview)
+
+cliff_swallows <- read_sf("C:/Users/jeff.matheson/Downloads/deerfoot_cliff/d4781c57ea5c4ad79a6a7717e3c8f9f5.gdb")
+c("C:/Users/jeff.matheson/Downloads/deerfoot_cliff/d4781c57ea5c4ad79a6a7717e3c8f9f5.gdb")
+
+mapview(cliff_swallows)
+
+st_write(cliff_swallows, 
+         driver = "KML", 
+         "C:/Users/jeff.matheson/Downloads/deerfoot_cliff/CLSW.kml")
+
+
+```
+
+>>>>>>> ff6e6677cbd265d9aafdc1644381420e905a5990
