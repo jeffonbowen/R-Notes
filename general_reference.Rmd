@@ -28,6 +28,7 @@ Here are some of the reference and learning materials that I have found useful.
 * Jenny Bryan course notes book <https://stat545.com/>
 * <https//:guru99.com> has some good tutorials. 
 * This is a good reference list. <https://github.com/iamericfletcher/r-learning-resources/blob/main/README.md>
+* Big Book of R <https://BigBookofR.com>  
 
 
 
