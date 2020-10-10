@@ -1,8 +1,7 @@
 # R-Notes
 
-This is where I keep by notes, reference material and example scripts. Jeff R Reference Notes is my main notebook for code and tips.
+This is where I keep by notes, reference material and example scripts.
 
--   [x] Intro to GAMs.
 -   [x] Put everything on Github. What to do with data files? Store on OneDrive?
 -   [x] Review style guide <https://style.tidyverse.org/>
 -   [ ] Go through complete biodversity analysis with the Site C bird data.
