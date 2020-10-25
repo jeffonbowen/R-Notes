@@ -1,0 +1,178 @@
+---
+title: "R Reference Notes"
+author: "Jeff Matheson"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+  github_document: default
+---
+
+**Note:** Some topics are now contained in their own file.
+
+# General Reference and Learning Materials
+
+Here are some of the reference and learning materials that I have found useful.
+
+-   R for Data Science. <https://r4ds.had.co.nz/transform.html>. I think this is a good entry to R after having learned just the basics of base R.  
+-   Data Camp seems very good for guided training.  
+-   Cookbook for R is handy, though wish it used tidy functions more.  
+-   Also the companion ggplot2 cookbook, <http://www.cookbook-r.com/Graphs/>
+-   This UBC course site has good references for fitting models in ecology. <https://www.zoology.ubc.ca/~schluter/R/Model.html>  
+-   Ecology in R (see Udemy website).  
+-   This is a long list of reference materials: <https://paulvanderlaken.com/2017/08/10/r-resources-cheatsheets-tutorials-books/>
+-   This is a good reference for the most-common aspects of R Markdown. <https://www.r-bloggers.com/getting-started-with-r-markdown-guide-and-cheatsheet/>
+-   Good blog post on good style. <https://kdestasio.github.io/post/r_best_practices/>
+-   Some good stuff about working in the R environment <https://rstats.wtf/>
+-   Jenny Bryan course notes book <https://stat545.com/>
+-   \<https//:guru99.com\> has some good tutorials.
+-   This is a good reference list. <https://github.com/iamericfletcher/r-learning-resources/blob/main/README.md>
+-   Big Book of R <https://BigBookofR.com>
+
+------------------------------------------------------------------------
+
+# Update R
+
+From R (not in RStudio) use package 'installr' and run `updateR()`.
+
+------------------------------------------------------------------------
+
+# Import/Read Data
+
+Best to use relative paths and not relay on setting working directory. But this is how you do it.
+
+    getwd()  
+    setwd("c:/      ")  
+    list.files()      Useful for copying a filename '  
+
+Package readr for importing csv files and setting column types.
+
+    indat <- read_csv('CEM_Oct10_13.csv', 
+                      col_types = cols(.default = "c",
+                                       'Shape_Area' = col_double())
+
+Package readxl to read MS Excel files. `stations <- read_excel("dat/Songto2019data.xlsx", "Stations", sheet = xxx, skip = lines)`
+
+## Setting Default for all columns
+
+`col_types = cols(.default = "c")`
+
+Interactive file selection:  
+`file.choose()`
+
+------------------------------------------------------------------------
+
+# View and clean data
+
+`Dim()` gives dimensions, but that is in the environment window anyway.  
+`head()` is handy for initial look at data.  
+`tail()`  
+`str()`  
+`summary()`  
+`rm()` remove from memory
+
+`glimpse()` is a nice way to have a quick peak at data. Can use at end of pipe.
+
+To check for missing values and nulls, use `is.na()` and `is.null()`. To get rid of rows with NA, use `na.omit()`.
+
+To get list of unique values, use `n_distinct()`or `count()` which provides frequency. Its preferable to using the base `table()` function.
+
+Package {janitor} helpful for cleaning data. `janitor::clean_names()` `janitor::tabyl()` is another option for a 2-way frequency table.
+
+To find duplicates, can use:
+
+    mtcars %>% 
+      group_by(carb) %>% 
+      filter(n()>1)
+
+Or `janitor::get_dupes()`
+
+To check coordinates, use `mapview()`.
+
+------------------------------------------------------------------------
+
+# Data Manipulation
+
+library(tidyverse) library(dplyr)  
+library(lubridate), to work wth time.
+
+Rename columns colnames(x) \<- c("a", "b") Base R rename(x, newname = oldname) Tidy way
+
+Subsetting data tmp \<- dat[dat$SERAL\_1 == "AS" & !is.na(dat$SERAL\_1), ] second part deals with NA rows
+
+To sort, use `arrange()` Create variables `mutate()` Benefit over base: more efficient with more than one variable.
+
+Filter out NA values x \<- x %\>% filter(!is.na(BHC20\_2))
+
+Recode values using base R dat[dat$SERAL\_1 == "AS" & !is.na(dat$SERAL\_1), ]$SERAL\_1 \<- "as"
+
+The tidy way is to use `if_else()` or if many substitutions, `case_when()`. In the example below, note the use of `TRUE ~ variable` for all other values to stay the same.
+
+    country_totals <- country_totals %>% 
+      mutate(country_name = 
+               case_when(
+                 country == "UK" ~ "United Kingdom",
+                 TRUE ~ country_name
+               )
+      )
+
+To convert to factor StationIDxEnvTest$CountOfStationID \<- as.factor(StationIDxEnvTest$CountOfStationID)
+
+## Abundance to Presence-Absence
+
+Can use `if_else(across(...), ...)` or something like that.
+
+# Count and tally
+
+Group\_by and Summarize sumdat \<- data %\>% group\_by(GRID\_ID, PRVUD, PRVUDOF, Accessible, Ownership, Candidate2, Region, BHC20\_1) %\>% summarise(Total = sum(Shape\_Area/10000)) %\>% top\_n(1, Total) %\>% filter(Candidate2 == "Yes")
+
+------------------------------------------------------------------------
+
+# Display and Formatting
+
+For turning strings in to numbers, use {stringr}. See examples in Home Finances project.
+
+---
+# Exploratory Data Analysis
+
+There are a couple of packages that can help automate initial exploration.  
+{skimr}
+{DataExplorer}  
+
+The TidyTuesday Penguin data analysis has some of my own examples.
+https://github.com/jeffonbowen/TidyTuesday
+---
+
+# Visualization
+
+library(ggplot2) For graphics  
+library(cowplot) addon to ggplot library(ggrepel) Add on for moving labels around
+
+g2 \<- ggplot(emmE.plot, aes(x=xEasting, y=mean, group=Habitat))+ geom\_line(aes(colour=Habitat))+  
+scale\_size\_manual(10)+ scale\_colour\_manual(values=c("\#1D4D18", "\#5BC355", "\#ABEB22","\#EBB57C"))+ xlab(label = "\<\<\< West -Location- East \>\>\>") + ylab(label = "Estimated mean density (males/ha) with 95% CI")+ labs(title=spp)+ theme\_bw()+ geom\_ribbon(aes(ymin = LCL, ymax = UCL, fill=Habitat, colour=NA), alpha=0.1, linetype=0) g2
+
+## Tables
+
+Package {kable} and {gt}
+
+------------------------------------------------------------------------
+
+# Classification
+
+library(rpart) for Recursive Classification and Regression. To produce a classification tree.
+
+For plotting, package rpart.plot.
+
+Example before fro TidyTuesday Penguins. <https://github.com/jeffonbowen/TidyTuesday>
+
+```{r}
+fitr <- rpart(data = penguins, formula = species ~ bill_length_mm + bill_depth_mm, 
+              flipper_length_mm + body_mass_g)
+fitr
+summary(fitr)
+# Print table of optimal prunings
+printcp(fitr)
+# Plot
+plot(fitr)
+text(fitr)
+```

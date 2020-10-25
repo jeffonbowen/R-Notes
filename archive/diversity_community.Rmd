@@ -23,7 +23,7 @@ RankAbun.1 <- rankabuncomp(stxsp, y=st.year, factor='Survey.Name', scale='propor
                            legend=T, rainbow=T)
 RankAbun.1 <- rankabuncomp(stXspAbunSMSA, y=stXyearSMSA, factor='Survey.Name', scale='proportion',
                            legend=T, rainbow=T)
-```
+```{r}
 library(iNEXT)
 out <- iNEXT(spider, q=c(0,1,2), datatype="abundance", size=m)
 ggiNEXT(x, type=1, se=TRUE, facet.var="order", color.var="site", grey=FALSE)
