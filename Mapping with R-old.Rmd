@@ -1,18 +1,23 @@
 ---
-title: "Spatial"
+title: "Mapping with R"
 author: "Jeff Matheson"
-output: 
+date: "23/01/2020"
+output:
   html_notebook:
-    toc: true
-    toc_float: true
+    toc: TRUE
 ---
 
 # Introduction
 
 These are my notes and code snippets relating to creation of maps using r.
 
-## Main packages for mapping in R  
-```{r}
+#### Reference Material:
+
+<https://rstudio.github.io/leaflet/map_widget.html>
+
+# Packages
+
+```{r packages, echo=TRUE, message=FALSE, warning=FALSE}
 library(sp)         ## Key package. Though being replaced by sf.
 library(sf)         ## Replaces sp. sp still needed for some things.
 library(rgdal)      ## Bindings for GDAL(?) seems to provide helper functions
@@ -21,59 +26,69 @@ library(raster)     ## This is key for raster manipulation.
 library(rasterVis)
 library(maptools)   ## Haven't used this yet
 
-library(maps)       # Collection of maps
+library(maps)
 
 library(rgeos)      # ? Has some data. Geometry Engine
 library(tmap)
 library(tmaptools)
 library(ggmap)      ## Spatial Visualization with ggplot2
-library(maps)
 
-library(bcmaps)
-```
+## For dynamic map bases
+library(leaflet)    # This is very popular. 
+library(mapview)    # Another popular package for interactive maps
 
-```{r}
-## For dynamic maps
-
-library(leaflet) # Key package for dynamic maps. 
-library(mapview) # Wrapper for leaflet. Great for quick viewing.
-
-## Web integration
-
-library(htmlwidgets) 
-library(shiny) 
+library(htmlwidgets)
+library(shiny)
 library(webshot)
+
+## Other: 
+library(sdm)        # species distribution modeling
+
 ```
-## Static Maps
 
-`gglot` keeps thingsin the tidyverse.
-
-`rnaturalearth` is good source for data and works nice with sf and ggplot.
+# Some Basic Mapping Examples
 
 ```{r}
-world <- ne_countries(scale = "medium", returnclass = "sf")
-world %>% 
-  ggplot() +
-  geom_sf() +
-  ggtitle("World")
+data("wrld_simpl")
+plot(wrld_simpl)
+data("canada_simpl")
+
+tm_shape("wrld_simpl") + tm_borders()
+
+map("worldHires","Canada”, xlim=c(-141,-53), ylim=c(40,85), col="gray90”, fill=TRUE))
 
 ```
-
 
 # Leaflet
+
 ```{r}
+## Leaflet
+
+library(leaflet)    # This is very popular. 
+
 m <- leaflet() %>% 
       addTiles() 
+##    addMarkers(lng=-120.912, lat=56.1938, popup="Site C")
+m  # Print the map
 
 setView(lng=-120.912, lat=56.1938, zoom=16)
 m
 
-OpenTopoMap  
-Esri.WorldStreetMap  
-Wikimedia ## good for roads  
-m %>% addProviderTiles(providers$Esri.WorldImagery)  
-m %>% addProviderTiles(providers$Esri.NatGeoWorldMap)  
-m %>% addProviderTiles(providers$Stamen.Watercolor)  
+OpenTopoMap
+Esri.WorldStreetMap
+Wikimedia ## good for roads
+m %>% addProviderTiles(providers$Esri.WorldImagery)
+m %>% addProviderTiles(providers$Esri.NatGeoWorldMap)
+m %>% addProviderTiles(providers$Stamen.Watercolor)
+
+
+library(rgdal)
+footprint <- readOGR("shp/BB_2017_ProjectFootprint.shp", layer = "BB_2017_ProjectFootprint")
+plot(footprint)
+summary(footprint)
+newcrs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+footprintLL <- spTransform(footprint, newcrs)
+summary(footprintLL)
 
 t <- leaflet(footprint)
 t
@@ -137,36 +152,22 @@ summary(footprintLL)
         
 ```
 
-
-
-Lat/long NAD83 is EPSG 4269 Lat/long WGS84 is EPSG 4326 UTM NAD83 zone 10N is EPSG 26911
-
-How to reproject
-
-    newcrs = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-    footprint <- spTransform(footprint, newcrs)
-
-Read/Write shapefile library(rgdal) writeOGR(footprint, dsn = ".", "fp\_wgs84", driver="ESRI Shapefile")
-
-Read UTM cooridnates and write same datafile with lat/long dat \<- read\_csv("WOODto2019.csv") dat \<- SpatialPointsDataFrame(coords = cbind(woodat$UTM\_Northing, woodat$UTM\_Easting), data = woodat, proj4string=CRS("+proj=utm +zone=10 +north +datum=NAD83"))  
-dat \<- spTransform(wooutm, CRS("+proj=longlat +datum=WGS84 +no\_defs +ellps=WGS84 +towgs84=0,0,0")) datout \<- (cbind([dat\@data](mailto:dat@data), [dat\@coords](mailto:dat@coords))) %\>% rename(Longitude = coords.x1, Latitude = coords.x2)
-
-Rasters GDALinfo("") raster file attributes before reading.
-
-
-# Google maps API 
-key = AIzaSyDq1pZGYfF1PmyxxvWvLPW22TH7dAOkt90
-
 ```{r}
-register_google(key = "AIzaSyDq1pZGYfF1PmyxxvWvLPW22TH7dAOkt90", write = TRUE)
-has_google_key()
-google_key()
-hdf <- get_map("houston, texas")
-ggmap(hdf, extent = "normal")
-ggmap(hdf) # extent = "panel", note qmap defaults to extent = "device"
-ggmap(hdf, extent = "device")
+# Add graticule
+m %>% addGraticule(interval = 1, group = "Graticule") %>%
+  addLayersControl(overlayGroups = c("Graticule"),
+    options = layersControlOptions(collapsed = FALSE))
+
+m %>% addMarkers(
+  clusterOptions = markerClusterOptions()
+)
+
+
+library(htmlwidgets)
+
 
 ```
+
 # Shiny
 
 ```{r}
@@ -179,25 +180,14 @@ shinyApp(ui=ui, server = server)
 
 ```
 
-# Rasters
-GDALinfo("") raster file attributes before reading.  
+# Google Maps API
 
-
-# Read File Geodatabase with sf
-And then save as KML.  
 ```{r}
-
-library(sf)
-library(mapview)
-
-cliff_swallows <- read_sf("C:/Users/jeff.matheson/Downloads/deerfoot_cliff/d4781c57ea5c4ad79a6a7717e3c8f9f5.gdb")
-c("C:/Users/jeff.matheson/Downloads/deerfoot_cliff/d4781c57ea5c4ad79a6a7717e3c8f9f5.gdb")
-
-mapview(cliff_swallows)
-
-st_write(cliff_swallows, 
-         driver = "KML", 
-         "C:/Users/jeff.matheson/Downloads/deerfoot_cliff/CLSW.kml")
-
-
+register_google(key = "AIzaSyDq1pZGYfF1PmyxxvWvLPW22TH7dAOkt90", write = TRUE)
+has_google_key()
+google_key()
+hdf <- get_map("houston, texas")
+ggmap(hdf, extent = "normal")
+ggmap(hdf) # extent = "panel", note qmap defaults to extent = "device"
+ggmap(hdf, extent = "device")
 ```
