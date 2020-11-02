@@ -1,0 +1,38 @@
+---
+title: "Sound Analysis"
+output: html_notebook
+---
+
+Learning how to use the monitoR package.
+
+```{r}
+library(monitoR)
+```
+
+```{r}
+data(survey)
+survey
+```
+
+```{r}
+viewSpec(survey)
+
+```
+
+```{r}
+class(survey)
+
+tuneR::setWavPlayer(shQuote("C:/Program Files (x86)/Windows Media Player/wmplayer.exe"))
+play(survey)
+
+getWavPlayer()
+```
+
+```{r paged.print=TRUE}
+data(btnw)
+data(oven)
+btnw
+oven
+viewSpec(btnw)
+viewSpec(oven)
+```
